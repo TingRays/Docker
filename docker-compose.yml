@@ -1,0 +1,70 @@
+version: "1.0"
+services:
+  mysql:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    container_name: mysql
+    privileged: true
+    restart: always
+    ports:
+      - 3307:3306
+    volumes:
+      - "/home/aaron/docker/mysql/log:/var/log"
+      - "/home/aaron/docker/mysql/data:/var/lib/mysql"
+      - "/home/aaron/docker/mysql/conf:/etc/mysql/conf.d"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    networks:
+      - "lanNet"
+  nginx:
+    image: nginx:1.23.4
+    container_name: nginx
+    privileged: true
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - "/home/aaron/docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf"
+      - "/home/aaron/docker/nginx/conf/conf.d:/etc/nginx/conf.d"
+      - "/home/aaron/docker/nginx/log:/var/log/nginx"
+      - "/home/aaron/docker/nginx/html:/usr/share/nginx/html"
+    networks:
+      - "lanNet"
+  redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
+    container_name: redis
+    privileged: true
+    restart: always
+    ports:
+      - 6380:6379
+    volumes:
+      - "/home/aaron/docker/redis/conf/redis.conf:/usr/redis/redis.conf"
+      - "/home/aaron/docker/redis/data:/data"
+      - "/home/aaron/docker/mysql/conf:/etc/mysql/conf.d"
+    networks:
+      - "lanNet"
+  hyperf:
+    build:
+      context: ./hyperf
+      dockerfile: Dockerfile
+    container_name: hyperf
+    privileged: true
+    restart: always
+    ports:
+      - 9501:9501
+    volumes:
+      - "/home/aaron/docker/hyperf/project:/data/project"
+    networks:
+      - "lanNet"
+networks:
+  lanNet:
+    name: "lanNet"
+    ipam:
+      driver: bridge
+      config:
+         - subnet: 10.10.0.0/16
+         - ip_range: 10.10.0.0/24
+         - gateway: 10.10.0.1
