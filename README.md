@@ -28,7 +28,7 @@ root@0105c:/mnt$
 
 #### 关于目录挂载
 
-我看到了关于使用软连接`ln -s [dir1] [dir2]`之外的方案：（没有测试过，自己试试）
+我看到了关于使用软连接`ln -s [dir1] [dir2]`之外的方案：（没有测试过，自己试试。[原文地址](https://stackoverflow.com/questions/41485217/mount-current-directory-as-a-volume-in-docker-on-windows-10)）
 
 在 Windows 命令行 （） 中，您可以像这样挂载当前目录：cmd
 
