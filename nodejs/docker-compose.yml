@@ -1,0 +1,13 @@
+version: "1.0"
+services:
+  nodejs:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: nodejs
+    privileged: true
+    restart: always
+    ports:
+      - 5173:5173
+    volumes:
+      - "/home/aaron/docker/nodejs:/app"
