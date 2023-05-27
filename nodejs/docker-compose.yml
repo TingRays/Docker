@@ -1,4 +1,4 @@
-version: "1.0"
+version: "2.18"
 services:
   nodejs:
     build:
@@ -7,11 +7,17 @@ services:
     container_name: nodejs
     privileged: true
     restart: always
+    #user: "node"
+    #working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
     ports:
       - 5173:5173
     volumes:
-      - "/home/aaron/docker/nodejs:/app"
-    environment:
-      NODE_ENV: development   #将其NODE_ENV设置为development,这样可以看到详细的Debug信息，也没有任何视图缓存。
-      DEBUG: "nodejs-docker-express:*"    #将debug设置为*，让Web服务器打印出所有内容的详细调试消息。
-
+      - "/home/aaron/docker/nodejs:/home"
+    #expose:
+    #  - "8081"
+    #command: "npm start"
+    #environment:
+    #  NODE_ENV: development #将其NODE_ENV设置为development,这样可以看到详细的Debug信息，也没有任何视图缓存。
+    #  DEBUG: "nodejs-docker-express:*" #将debug设置为*，让Web服务器打印出所有内容的详细调试消息。
