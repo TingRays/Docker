@@ -9,7 +9,7 @@ MySQL，Nginx，Redis，Hyperf 的 Dockerfile 和 compose。
 >
 > 然后在 Microsoft Store 安装 Ubuntu 或者 Debian 等，看自己兴趣
 >
-> 安装好 Linux 操作系统后查看[Install on Linux](https://docs.docker.com/desktop/install/linux-install/)官方 Docker 文档安装
+> 安装好 Linux 操作系统后查看[Install on Linux](https://docs.docker.com/engine/install/ubuntu/)官方 Docker 文档安装
 
 运行安装好的子系统：
 
