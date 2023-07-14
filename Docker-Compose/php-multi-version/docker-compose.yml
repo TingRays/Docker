@@ -2,7 +2,7 @@ version: "2.0"
 services:
   mysql:
     build:
-      context: ./mysql
+      context: ../../mysql
       dockerfile: Dockerfile
     container_name: mysql
     privileged: true
@@ -33,7 +33,7 @@ services:
       - "lanNet"
   redis:
     build:
-      context: ./redis
+      context: ../../redis
       dockerfile: Dockerfile
     container_name: redis
     privileged: true
