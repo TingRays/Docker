@@ -2,7 +2,7 @@ version: "2.0"
 services:
   mysql:
     build:
-      context: ../../mysql
+      context: ./mysql
       dockerfile: Dockerfile
     container_name: mysql
     privileged: true
@@ -33,7 +33,7 @@ services:
       - "lanNet"
   redis:
     build:
-      context: ../../redis
+      context: ./redis
       dockerfile: Dockerfile
     container_name: redis
     privileged: true
@@ -43,20 +43,48 @@ services:
     volumes:
       - "/home/aaron/docker/redis/conf/redis.conf:/usr/redis/redis.conf"
       - "/home/aaron/docker/redis/data:/data"
-      - "/home/aaron/docker/mysql/conf:/etc/mysql/conf.d"
     networks:
       - "lanNet"
-  hyperf:
+  php72:
     build:
-      context: ./hyperf
+      context: ./php/7.2
       dockerfile: Dockerfile
-    container_name: hyperf
+    container_name: php72
     privileged: true
     restart: always
     ports:
-      - 9501:9501
+      - 9001:9001
     volumes:
-      - "/home/aaron/docker/hyperf/project:/data/project"
+      - "/home/aaron/docker/php72/html:/var/www/html"
+      - "/home/aaron/docker/php72/conf:/usr/local/etc/php/"
+    networks:
+      - "lanNet"
+  php74:
+    build:
+      context: ./php/7.4
+      dockerfile: Dockerfile
+    container_name: php74
+    privileged: true
+    restart: always
+    ports:
+      - 9002:9002
+    volumes:
+      - "/home/aaron/docker/php74/html:/var/www/html"
+      - "/home/aaron/docker/php74/conf:/usr/local/etc/php/"
+    networks:
+      - "lanNet"
+  php81:
+    build:
+      context: ./php/8.1
+      dockerfile: Dockerfile
+    container_name: php81
+    privileged: true
+    restart: always
+    ports:
+      - 9002:9002
+    volumes:
+      - "/home/aaron/docker/php81/html:/var/www/html"
+      - "/home/aaron/docker/php81/conf:/usr/local/etc/php/"
     networks:
       - "lanNet"
 networks:
