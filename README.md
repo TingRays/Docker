@@ -3,7 +3,7 @@
 MySQL，Nginx，Redis，Hyperf 的 Dockerfile 和 compose。
 挂载卷路径都是在本地电脑安装 WSL 里的。
 
-### window 的 WSL 使用 Docker
+### windows 的 WSL 使用 Docker
 
 > 首先电脑上要有 WSL，网上有相关文章（搜索词：windows 安装 WSL2）
 >
