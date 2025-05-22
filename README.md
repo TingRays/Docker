@@ -6,9 +6,9 @@ MySQL，Nginx，Redis，Hyperf 的 Dockerfile 和 compose。
 ### windows 的 WSL 使用 Docker
 
 > 首先电脑上要有 WSL，网上有相关文章（搜索词：windows 安装 WSL2）
->
+> 
 > 然后在 Microsoft Store 安装 Ubuntu 或者 Debian 等，看自己兴趣
->
+> 
 > 安装好 Linux 操作系统后查看[Install on Linux](https://docs.docker.com/engine/install/ubuntu/)官方 Docker 文档安装
 
 运行安装好的子系统：
@@ -55,3 +55,7 @@ docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 docker run --rm -it -v ${PWD}:/usr/src/project gcc:4.9
 docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 ```
+
+目录：DebianBasicImage
+
+以 Debian 作为基础镜像，在基础镜像里安装 Nginx、Redis、PHP、Mysql等服务，构建运行环境
