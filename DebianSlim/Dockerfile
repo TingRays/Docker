@@ -1,21 +1,32 @@
 # 使用Debian 12作为基础镜像
-FROM debian:stable-backports
+FROM debian:bookworm
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
     PHP_VERSIONS="7.4 8.0 8.2 8.3"
 
+# === 修复关键：将Debian源从HTTP改为HTTPS ===
+# 修复网络连接问题（Debian 12强制使用HTTPS）
+RUN echo "deb https://deb.debian.org/debian bookworm main" > /etc/apt/sources.list.d/debian.list && \
+    echo "deb https://deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list.d/debian.list && \
+    echo "deb https://deb.debian.org/debian bookworm-security main" >> /etc/apt/sources.list.d/debian.list
+
+# === 修复关键：拆分安装步骤，避免内存峰值 ===
+# 第一步：只更新包索引（内存需求低）
+RUN apt-get update
+
 # 安装基本依赖
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
     curl \
     wget \
     gnupg \
     ca-certificates \
     lsb-release \
     apt-transport-https \
-    software-properties-common \
-    sudo \
-    && rm -rf /var/lib/apt/lists/*
+    sudo
+
+# 在安装基本依赖后立即清理缓存
+RUN apt-get clean
 
 # 添加PHP仓库 (Sury)
 RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
@@ -23,7 +34,7 @@ RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt
 
 # 添加MySQL仓库
 RUN wget -O /etc/apt/trusted.gpg.d/mysql.gpg https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
-RUN echo "deb http://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" > /etc/apt/sources.list.d/mysql.list
+RUN echo "deb https://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" > /etc/apt/sources.list.d/mysql.list
 
 # 添加MongoDB仓库
 RUN wget -O /usr/share/keyrings/mongodb-archive-keyring.gpg https://pgp.mongodb.com/server-6.0.asc
@@ -34,7 +45,9 @@ RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyri
 RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
 
 # 更新并安装所有服务
-RUN apt-get update && apt-get install -y \
+RUN apt-get update
+
+RUN apt-get install -y \
     nginx \
     mysql-server \
     mongodb-org \
