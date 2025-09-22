@@ -5,12 +5,6 @@ FROM debian:bookworm
 ENV DEBIAN_FRONTEND=noninteractive \
     PHP_VERSIONS="7.4 8.0 8.2 8.3"
 
-# === 修复关键：将Debian源从HTTP改为HTTPS ===
-# 修复网络连接问题（Debian 12强制使用HTTPS）
-RUN echo "deb https://deb.debian.org/debian bookworm main" > /etc/apt/sources.list.d/debian.list && \
-    echo "deb https://deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list.d/debian.list && \
-    echo "deb https://deb.debian.org/debian bookworm-security main" >> /etc/apt/sources.list.d/debian.list
-
 # === 修复关键：拆分安装步骤，避免内存峰值 ===
 # 第一步：只更新包索引（内存需求低）
 RUN apt-get update
@@ -23,26 +17,40 @@ RUN apt-get install -y \
     ca-certificates \
     lsb-release \
     apt-transport-https \
-    sudo
+    sudo \
+    dirmngr
 
 # 在安装基本依赖后立即清理缓存
 RUN apt-get clean
+
+# 添加Bullseye安全仓库解决libssl依赖
+RUN echo "deb http://security.debian.org/debian-security bullseye-security main" | sudo tee /etc/apt/sources.list.d/bullseye-security.list
+
+# MongoDB GPG密钥
+RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+    sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
+    --dearmor
+
+# MySQL GPG密钥
+RUN curl -sSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 -o /tmp/mysql.gpg && \
+    gpg --dearmor --output /usr/share/keyrings/mysql-archive-keyring.gpg /tmp/mysql.gpg && \
+    rm /tmp/mysql.gpg
+
+# Redis GPG密钥
+RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
 
 # 添加PHP仓库 (Sury)
 RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
 # 添加MySQL仓库
-RUN wget -O /etc/apt/trusted.gpg.d/mysql.gpg https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
-RUN echo "deb https://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" > /etc/apt/sources.list.d/mysql.list
+RUN echo "deb [ signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg ] https://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list
 
 # 添加MongoDB仓库
-RUN wget -O /usr/share/keyrings/mongodb-archive-keyring.gpg https://pgp.mongodb.com/server-6.0.asc
-RUN echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-archive-keyring.gpg ] https://repo.mongodb.org/apt/debian bookworm/mongodb-org/6.0 main" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 
 # 添加Redis仓库
-RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
+RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages redis io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
 
 # 更新并安装所有服务
 RUN apt-get update
