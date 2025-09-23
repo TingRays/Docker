@@ -40,6 +40,8 @@ RUN curl -sSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 -o /tmp/mysql.gpg &&
 RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
 
 # 添加PHP仓库 (Sury)
+# https://deb.sury.org/ 是Debian官方的PHP构建者维护的PHP源
+# https://packages.sury.org/php/README.txt 的步骤可以直接添加最新的PHP源到apt source
 RUN curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb && \
     dpkg -i /tmp/debsuryorg-archive-keyring.deb && \
     sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
