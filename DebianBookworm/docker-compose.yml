@@ -1,6 +1,9 @@
 services:
   app:
-    build: .
+    image: tingrays:debian-bookworm
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: php-multi-app
     ports:
       - "80:80"

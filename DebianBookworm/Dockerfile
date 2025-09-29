@@ -53,7 +53,7 @@ RUN echo "deb [ signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg ] https:
 RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 
 # 添加Redis仓库
-RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages redis io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
+RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
 
 # 更新并安装所有服务
 RUN apt-get update
@@ -141,42 +141,42 @@ RUN for version in $PHP_VERSIONS; do \
     php${version}-imagick; \
     done
 
-# 创建必要的目录
-RUN mkdir -p /var/run/php && \
-    mkdir -p /var/log/nginx && \
-    mkdir -p /var/log/mysql && \
-    mkdir -p /var/log/mongodb && \
-    mkdir -p /var/log/redis && \
-    mkdir -p /var/www/html && \
-    mkdir -p /data/db
+## 创建必要的目录
+#RUN mkdir -p /var/run/php && \
+#    mkdir -p /var/log/nginx && \
+#    mkdir -p /var/log/mysql && \
+#    mkdir -p /var/log/mongodb && \
+#    mkdir -p /var/log/redis && \
+#    mkdir -p /var/www/html && \
+#    mkdir -p /data/db
 
-# 配置PHP各版本
-RUN for version in $PHP_VERSIONS; do \
-    # 配置FPM池
-    sed -i "s/;listen\.owner.*/listen.owner = www-data/" /etc/php/${version}/fpm/pool.d/www.conf && \
-    sed -i "s/;listen\.group.*/listen.group = www-data/" /etc/php/${version}/fpm/pool.d/www.conf && \
-    sed -i "s/;listen\.mode.*/listen.mode = 0660/" /etc/php/${version}/fpm/pool.d/www.conf && \
-    \
-    # 增加PHP配置
-    echo "upload_max_filesize = 128M" >> /etc/php/${version}/fpm/php.ini && \
-    echo "post_max_size = 128M" >> /etc/php/${version}/fpm/php.ini && \
-    echo "memory_limit = 512M" >> /etc/php/${version}/fpm/php.ini && \
-    echo "max_execution_time = 300" >> /etc/php/${version}/fpm/php.ini && \
-    echo "max_input_time = 300" >> /etc/php/${version}/fpm/php.ini && \
-    \
-    # 启用OPCache
-    echo "opcache.enable=1" >> /etc/php/${version}/fpm/php.ini && \
-    echo "opcache.enable_cli=1" >> /etc/php/${version}/fpm/php.ini && \
-    echo "opcache.memory_consumption=128" >> /etc/php/${version}/fpm/php.ini && \
-    echo "opcache.interned_strings_buffer=8" >> /etc/php/${version}/fpm/php.ini && \
-    echo "opcache.max_accelerated_files=10000" >> /etc/php/${version}/fpm/php.ini && \
-    echo "opcache.revalidate_freq=2" >> /etc/php/${version}/fpm/php.ini && \
-    echo "opcache.save_comments=1" >> /etc/php/${version}/fpm/php.ini; \
-    done
+## 配置PHP各版本
+#RUN for version in $PHP_VERSIONS; do \
+#    # 配置FPM池
+#    sed -i "s/;listen\.owner.*/listen.owner = www-data/" /etc/php/${version}/fpm/pool.d/www.conf && \
+#    sed -i "s/;listen\.group.*/listen.group = www-data/" /etc/php/${version}/fpm/pool.d/www.conf && \
+#    sed -i "s/;listen\.mode.*/listen.mode = 0660/" /etc/php/${version}/fpm/pool.d/www.conf && \
+#    \
+#    # 增加PHP配置
+#    echo "upload_max_filesize = 128M" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "post_max_size = 128M" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "memory_limit = 512M" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "max_execution_time = 300" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "max_input_time = 300" >> /etc/php/${version}/fpm/php.ini && \
+#    \
+#    # 启用OPCache
+#    echo "opcache.enable=1" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "opcache.enable_cli=1" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "opcache.memory_consumption=128" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "opcache.interned_strings_buffer=8" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "opcache.max_accelerated_files=10000" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "opcache.revalidate_freq=2" >> /etc/php/${version}/fpm/php.ini && \
+#    echo "opcache.save_comments=1" >> /etc/php/${version}/fpm/php.ini; \
+#    done
 
-# 复制启动脚本
-COPY start-services.sh /usr/local/bin/start-services.sh
-RUN chmod +x /usr/local/bin/start-services.sh
+## 复制启动脚本
+#COPY start-services.sh /usr/local/bin/start-services.sh
+#RUN chmod +x /usr/local/bin/start-services.sh
 
 # 暴露端口
 EXPOSE 80 3306 27017 6379
@@ -184,5 +184,5 @@ EXPOSE 80 3306 27017 6379
 # 设置工作目录
 WORKDIR /var/www/html
 
-# 启动服务
-CMD ["/usr/local/bin/start-services.sh"]
+## 启动服务
+#CMD ["/usr/local/bin/start-services.sh"]
