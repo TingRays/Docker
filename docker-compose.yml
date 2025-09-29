@@ -1,4 +1,4 @@
-version: "2.0"
+version: "3.0"
 services:
   mysql:
     build:
@@ -43,20 +43,38 @@ services:
     volumes:
       - "/home/aaron/docker/redis/conf/redis.conf:/usr/redis/redis.conf"
       - "/home/aaron/docker/redis/data:/data"
-      - "/home/aaron/docker/mysql/conf:/etc/mysql/conf.d"
     networks:
       - "lanNet"
+  # hyperf:
+  #   build:
+  #     context: ./hyperf
+  #     dockerfile: Dockerfile
+  #   container_name: hyperf
+  #   privileged: true
+  #   restart: always
+  #   ports:
+  #     - 9501:9501
+  #   volumes:
+  #     - "/home/aaron/docker/hyperf/project:/data/project"
+  #   networks:
+  #     - "lanNet"
   hyperf:
-    build:
-      context: ./hyperf
-      dockerfile: Dockerfile
-    container_name: hyperf
+    container_name: mine-admin
+    image: hyperf/hyperf:8.1-alpine-v3.18-swoole
     privileged: true
     restart: always
+    environment:
+      - "TIMEZONE=Asia/Shanghai"
+      - "APP_PROJECT=hyperf"
+      - "APP_SYSTEM_ENV=docker"
+    working_dir: "/data/project/hyperf"
     ports:
-      - 9501:9501
+     - 9501:9501
+     - 9502:9502
+     - 9503:9503
     volumes:
       - "/home/aaron/docker/hyperf/project:/data/project"
+    entrypoint: [ "php", "watch", "-c" ]
     networks:
       - "lanNet"
 networks:
