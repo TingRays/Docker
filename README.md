@@ -3,7 +3,7 @@
 MySQL，Nginx，Redis，Hyperf 的 Dockerfile 和 compose。
 挂载卷路径都是在本地电脑安装 WSL 里的。
 
-### window 的 WSL 使用 Docker
+### windows 的 WSL 使用 Docker
 
 > 首先电脑上要有 WSL，网上有相关文章（搜索词：windows 安装 WSL2）
 > 
@@ -55,3 +55,7 @@ docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 docker run --rm -it -v ${PWD}:/usr/src/project gcc:4.9
 docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 ```
+
+目录：DebianBasicImage
+
+以 Debian 作为基础镜像，在基础镜像里安装 Nginx、Redis、PHP、Mysql等服务，构建运行环境

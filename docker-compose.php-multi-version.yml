@@ -53,7 +53,7 @@ services:
     privileged: true
     restart: always
     ports:
-      - 9001:9001
+      - 9000:9000
     volumes:
       - "/home/aaron/docker/php72/html:/var/www/html"
       - "/home/aaron/docker/php72/conf:/usr/local/etc/php/"
@@ -67,7 +67,7 @@ services:
     privileged: true
     restart: always
     ports:
-      - 9002:9002
+      - 9000:9001
     volumes:
       - "/home/aaron/docker/php74/html:/var/www/html"
       - "/home/aaron/docker/php74/conf:/usr/local/etc/php/"
@@ -81,7 +81,7 @@ services:
     privileged: true
     restart: always
     ports:
-      - 9002:9002
+      - 9000:9002
     volumes:
       - "/home/aaron/docker/php81/html:/var/www/html"
       - "/home/aaron/docker/php81/conf:/usr/local/etc/php/"
@@ -90,9 +90,10 @@ services:
 networks:
   lanNet:
     name: "lanNet"
+    driver: "bridge"
     ipam:
-      driver: bridge
+      driver: "default"
       config:
          - subnet: 10.10.0.0/16
-         - ip_range: 10.10.0.0/24
-         - gateway: 10.10.0.1
+           ip_range: 10.10.0.0/24
+           gateway: 10.10.0.1
