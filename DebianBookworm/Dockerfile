@@ -141,14 +141,14 @@ RUN for version in $PHP_VERSIONS; do \
     php${version}-imagick; \
     done
 
-## 创建必要的目录
-#RUN mkdir -p /var/run/php && \
-#    mkdir -p /var/log/nginx && \
-#    mkdir -p /var/log/mysql && \
-#    mkdir -p /var/log/mongodb && \
-#    mkdir -p /var/log/redis && \
-#    mkdir -p /var/www/html && \
-#    mkdir -p /data/db
+# 创建必要的目录
+RUN mkdir -p /var/run/php && \
+    mkdir -p /var/log/nginx && \
+    mkdir -p /var/log/mysql && \
+    mkdir -p /var/log/mongodb && \
+    mkdir -p /var/log/redis && \
+    mkdir -p /var/www/html && \
+    mkdir -p /data/db
 
 ## 配置PHP各版本
 #RUN for version in $PHP_VERSIONS; do \
@@ -174,9 +174,9 @@ RUN for version in $PHP_VERSIONS; do \
 #    echo "opcache.save_comments=1" >> /etc/php/${version}/fpm/php.ini; \
 #    done
 
-## 复制启动脚本
-#COPY start-services.sh /usr/local/bin/start-services.sh
-#RUN chmod +x /usr/local/bin/start-services.sh
+# 复制启动脚本
+COPY start-services.sh /usr/local/bin/start-services.sh
+RUN chmod +x /usr/local/bin/start-services.sh
 
 # 暴露端口
 EXPOSE 80 3306 27017 6379
@@ -184,5 +184,5 @@ EXPOSE 80 3306 27017 6379
 # 设置工作目录
 WORKDIR /var/www/html
 
-## 启动服务
-#CMD ["/usr/local/bin/start-services.sh"]
+# 启动服务
+CMD ["/usr/local/bin/start-services.sh"]

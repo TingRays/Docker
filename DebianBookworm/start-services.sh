@@ -40,7 +40,7 @@ for version in 7.4 8.0 8.2 8.3; do
 done
 
 # 设置Nginx目录权限
-chown -R www:www /var/www/html
+chown -R www-data:www-data /var/www/html
 
 # 启动Nginx
 nginx -g "daemon off;"
