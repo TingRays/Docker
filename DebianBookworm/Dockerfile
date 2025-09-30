@@ -18,6 +18,7 @@ RUN apt-get install -y \
     lsb-release \
     apt-transport-https \
     gpg \
+    debian-archive-keyring \
     sudo \
     dirmngr
 
@@ -58,6 +59,10 @@ RUN curl -sSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 -o /tmp/mysql.gpg &&
 # Redis GPG密钥
 RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
 RUN sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+
+# 添加Nginx GPG密钥
+RUN curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null && \
+    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
 
 # 添加PHP仓库 (Sury)
 # https://deb.sury.org/ 是Debian官方的PHP构建者维护的PHP源
