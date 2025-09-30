@@ -13,16 +13,18 @@ services:
     volumes:
       - ./nginx/conf.d/:/etc/nginx/conf.d/
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./mysql/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/data:/var/lib/mysql
-      - ./redis/redis.conf:/etc/redis/redis.conf
+      - ./mysql/conf/:/etc/mysql/
+      - ./mysql/data/:/var/lib/mysql/
+      - ./redis/:/etc/redis/
+      - ./mongodb/data/:/var/lib/mongodb/
+      - ./mongodb/log/:/var/log/mongodb/
       - ./mongodb/mongod.conf:/etc/mongod.conf
-      - ./www:/var/www/html
+      - ./www/:/var/www/html/
       # 添加PHP配置目录挂载，方便修改配置
-      - ./php7.4:/etc/php/7.4
-      - ./php8.0:/etc/php/8.0
-      - ./php8.2:/etc/php/8.2
-      - ./php8.3:/etc/php/8.3
+      - ./php/7.4:/etc/php/7.4
+      - ./php/8.0:/etc/php/8.0
+      - ./php/8.2:/etc/php/8.2
+      - ./php/8.3:/etc/php/8.3
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}

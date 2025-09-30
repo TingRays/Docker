@@ -17,11 +17,30 @@ RUN apt-get install -y \
     ca-certificates \
     lsb-release \
     apt-transport-https \
+    gpg \
     sudo \
     dirmngr
 
 # 在安装基本依赖后立即清理缓存
 RUN apt-get clean
+
+# /etc/php/ PHP目录
+# /etc/nginx/ Nginx相关配置文件目录
+# /etc/mysql/ MySQL配置文件目录
+# /var/lib/mysql/ MySQL数据目录
+# /var/lib/mongodb/ MongoDB数据文件
+# /var/log/mongodb/ MongoDB日志文件
+# /etc/mongod.conf  MongoDB配置文件
+# /etc/redis/  Redis配置文件目录
+# 创建必要的目录
+RUN mkdir -p /etc/php/ && \
+    mkdir -p /etc/nginx/ && \
+    mkdir -p /etc/mysql/ && \
+    mkdir -p /var/lib/mysql/ && \
+    mkdir -p /var/lib/mongodb/ && \
+    mkdir -p /var/log/mongodb/ && \
+    mkdir -p /var/www/html/ && \
+    mkdir -p /etc/redis/
 
 # 添加Bullseye安全仓库解决libssl依赖
 RUN echo "deb http://security.debian.org/debian-security bullseye-security main" | sudo tee /etc/apt/sources.list.d/bullseye-security.list
@@ -37,7 +56,8 @@ RUN curl -sSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 -o /tmp/mysql.gpg &&
     rm /tmp/mysql.gpg
 
 # Redis GPG密钥
-RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+RUN sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
 
 # 添加PHP仓库 (Sury)
 # https://deb.sury.org/ 是Debian官方的PHP构建者维护的PHP源
@@ -47,13 +67,16 @@ RUN curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/deb
     sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 
 # 添加MySQL仓库
-RUN echo "deb [ signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg ] https://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list
+RUN echo "deb [ signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg ] http://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list
 
 # 添加MongoDB仓库
 RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 
 # 添加Redis仓库
-RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
+RUN echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+
+# 添加Nginx仓库
+RUN echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list
 
 # 更新并安装所有服务
 RUN apt-get update
@@ -62,7 +85,7 @@ RUN apt-get install -y \
     nginx \
     mysql-server \
     mongodb-org \
-    redis-server \
+    redis \
     && for version in $PHP_VERSIONS; do \
     apt-get install -y \
     php${version} \
@@ -140,15 +163,6 @@ RUN for version in $PHP_VERSIONS; do \
     php${version}-xdebug \
     php${version}-imagick; \
     done
-
-# 创建必要的目录
-RUN mkdir -p /var/run/php && \
-    mkdir -p /var/log/nginx && \
-    mkdir -p /var/log/mysql && \
-    mkdir -p /var/log/mongodb && \
-    mkdir -p /var/log/redis && \
-    mkdir -p /var/www/html && \
-    mkdir -p /data/db
 
 ## 配置PHP各版本
 #RUN for version in $PHP_VERSIONS; do \

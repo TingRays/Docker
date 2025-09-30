@@ -15,10 +15,6 @@ if [ -n "$MYSQL_ROOT_PASSWORD" ] && [ -n "$MYSQL_DATABASE" ] && [ -n "$MYSQL_USE
     mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "FLUSH PRIVILEGES;"
 fi
 
-# 设置MongoDB数据目录权限
-mkdir -p /data/db
-chown -R mongodb:mongodb /data/db
-
 # 启动MongoDB
 service mongod start
 
