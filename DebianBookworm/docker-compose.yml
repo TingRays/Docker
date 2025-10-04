@@ -21,10 +21,9 @@ services:
       - ./mongodb/mongod.conf:/etc/mongod.conf
       - ./www/:/var/www/html/
       # 添加PHP配置目录挂载，方便修改配置
-      - ./php/7.4:/etc/php/7.4
-      - ./php/8.0:/etc/php/8.0
-      - ./php/8.2:/etc/php/8.2
-      - ./php/8.3:/etc/php/8.3
+      - ./php/7.4/:/etc/php/7.4/
+      - ./php/8.0/:/etc/php/8.0/
+      - ./php/8.3/:/etc/php/8.3/
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}

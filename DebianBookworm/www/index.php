@@ -4,7 +4,11 @@ echo "<h1>PHP环境信息</h1>";
 
 // 显示当前PHP版本
 echo "<p>当前PHP版本: " . PHP_VERSION . "</p>";
-
+putenv("MYSQL_DATABASE=test");
+putenv("MYSQL_USER=test");
+putenv("MYSQL_PASSWORD=123456");
+putenv("REDIS_PASSWORD=123456");
+print_r(phpinfo());
 // 测试MySQL连接
 try {
     $pdo = new PDO(

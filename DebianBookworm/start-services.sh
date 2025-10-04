@@ -31,7 +31,7 @@ chown -R redis:redis /var/lib/redis
 service redis-server start
 
 # 启动各版本PHP-FPM
-for version in 7.4 8.0 8.2 8.3; do
+for version in 7.4 8.0 8.3; do
     service php${version}-fpm start
 done
 

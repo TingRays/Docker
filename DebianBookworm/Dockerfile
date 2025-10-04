@@ -3,7 +3,7 @@ FROM debian:bookworm
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
-    PHP_VERSIONS="7.4 8.0 8.2 8.3"
+    PHP_VERSIONS="7.4 8.0 8.3"
 
 # === 修复关键：拆分安装步骤，避免内存峰值 ===
 # 第一步：只更新包索引（内存需求低）
@@ -125,7 +125,7 @@ ENV PHP_COMMON_EXTENSIONS=" \
     opcache \
     pcntl \
     pdo \
-    pdo_mysql \
+    mysql \
     pdo_pgsql \
     pdo_sqlite \
     pgsql \
