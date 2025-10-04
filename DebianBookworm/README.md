@@ -12,7 +12,7 @@ docker exec -it php-multi-app /bin/bash
 docker cp php-multi-app:/etc/php/8.3/. ./php/8.3/
 
 
-镜像源：
+# 镜像源：
 sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json << 'EOF'
 {
