@@ -51,10 +51,21 @@ RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
     sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
     --dearmor
 
-# MySQL GPG密钥
-RUN curl -sSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 -o /tmp/mysql.gpg && \
-    gpg --dearmor --output /usr/share/keyrings/mysql-archive-keyring.gpg /tmp/mysql.gpg && \
-    rm /tmp/mysql.gpg
+# MySQL APT存储库
+COPY mysql-apt-config_0.8.35-1_all.deb /usr/local/bin/mysql-apt-config_0.8.35-1_all.deb
+RUN { \
+    echo mysql-apt-config mysql-apt-config/connectors-component string mysql-tools; \
+    echo mysql-apt-config mysql-apt-config/repo-codename select bookworm; \
+    echo mysql-apt-config mysql-apt-config/repo-distro select debian; \
+    echo mysql-apt-config mysql-apt-config/repo-url string http://repo.mysql.com/apt; \
+    echo mysql-apt-config mysql-apt-config/select-connectors select Enabled; \
+    echo mysql-apt-config mysql-apt-config/select-product select Ok; \
+    echo mysql-apt-config mysql-apt-config/select-server select mysql-8.4-lts; \
+    echo mysql-apt-config mysql-apt-config/unsupported-platform select abort; \
+    } | debconf-set-selections && sudo dpkg -i --force-confdef --force-confold /usr/local/bin/mysql-apt-config_0.8.35-1_all.deb
+# RUN curl -sSL https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 -o /tmp/mysql.gpg && \
+#     gpg --dearmor --output /usr/share/keyrings/mysql-archive-keyring.gpg /tmp/mysql.gpg && \
+#     rm /tmp/mysql.gpg
 
 # Redis GPG密钥
 RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
@@ -72,7 +83,7 @@ RUN curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/deb
     sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 
 # 添加MySQL仓库
-RUN echo "deb [ signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg ] http://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list
+# RUN echo "deb [ signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg ] http://repo.mysql.com/apt/debian/ $(lsb_release -sc) mysql-8.0" | tee /etc/apt/sources.list.d/mysql.list
 
 # 添加MongoDB仓库
 RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
