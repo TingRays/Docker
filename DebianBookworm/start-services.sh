@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # 设置MySQL数据目录权限
+chown -R mysql:mysql /etc/mysql
 chown -R mysql:mysql /var/lib/mysql
 
 # 启动MySQL
+exec mysqld
 service mysql start
 
 # 初始化MySQL数据库和用户
@@ -15,7 +17,12 @@ if [ -n "$MYSQL_ROOT_PASSWORD" ] && [ -n "$MYSQL_DATABASE" ] && [ -n "$MYSQL_USE
     mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "FLUSH PRIVILEGES;"
 fi
 
+# 设置MongoDB数据目录权限
+chown -R mongodb:mongodb /var/lib/mongodb
+chown -R mongodb:mongodb /var/log/mongodb
+chown -R mongodb:mongodb /etc/mongod.conf
 # 启动MongoDB
+exec mongod
 service mongod start
 
 # 设置Redis配置
@@ -25,13 +32,16 @@ fi
 
 # 设置Redis数据目录权限
 mkdir -p /var/lib/redis
+chown -R redis:redis /etc/redis
 chown -R redis:redis /var/lib/redis
 
 # 启动Redis
+exec redis-server
 service redis-server start
 
 # 启动各版本PHP-FPM
 for version in 7.4 8.0 8.3; do
+    exec php${version}-fpm
     service php${version}-fpm start
 done
 
@@ -39,4 +49,4 @@ done
 chown -R www-data:www-data /var/www/html
 
 # 启动Nginx
-nginx -g "daemon off;"
+exec nginx -g "daemon off;"
