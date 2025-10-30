@@ -105,9 +105,7 @@ RUN apt-get install -y --no-install-recommends\
     redis \
     && for version in $PHP_VERSIONS; do \
     apt-get install -y \
-    php${version} \
-    php${version}-fpm \
-    php${version}-common; \
+    php${version}-fpm ; \
     done
 
 # 定义PHP常用扩展列表
