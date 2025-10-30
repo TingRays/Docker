@@ -54,16 +54,6 @@ RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
 # MySQL APT存储库
 # RUN curl -sSL https://repo.mysql.com/mysql-apt-config_0.8.36-1_all.deb > /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
 COPY mysql-apt-config_0.8.36-1_all.deb /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
-RUN { \
-    echo mysql-apt-config mysql-apt-config/connectors-component string mysql-tools; \
-    echo mysql-apt-config mysql-apt-config/repo-codename select bookworm; \
-    echo mysql-apt-config mysql-apt-config/repo-distro select debian; \
-    echo mysql-apt-config mysql-apt-config/repo-url string http://repo.mysql.com/apt; \
-    echo mysql-apt-config mysql-apt-config/select-connectors select Enabled; \
-    echo mysql-apt-config mysql-apt-config/select-product select Ok; \
-    echo mysql-apt-config mysql-apt-config/select-server select mysql-8.4-lts; \
-    echo mysql-apt-config mysql-apt-config/unsupported-platform select abort; \
-    } | debconf-set-selections
 
 # Redis GPG密钥
 RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
@@ -81,7 +71,7 @@ RUN curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/deb
     sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 
 # 添加MySQL仓库
-RUN sudo dpkg -i /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
+RUN sudo DEBIAN_FRONTEND=noninteractive dpkg -i /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
 
 # 添加MongoDB仓库
 RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
@@ -95,16 +85,28 @@ RUN echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://n
 # 更新并安装所有服务
 RUN apt-get update
 
-RUN apt-get install -y --no-install-recommends \
+# MySQL静默安装预配置
+RUN { \
+    echo mysql-apt-config mysql-apt-config/connectors-component string mysql-tools; \
+    echo mysql-apt-config mysql-apt-config/repo-codename select bookworm; \
+    echo mysql-apt-config mysql-apt-config/repo-distro select debian; \
+    echo mysql-apt-config mysql-apt-config/repo-url string http://repo.mysql.com/apt; \
+    echo mysql-apt-config mysql-apt-config/select-connectors select Enabled; \
+    echo mysql-apt-config mysql-apt-config/select-product select Ok; \
+    echo mysql-apt-config mysql-apt-config/select-server select mysql-8.4-lts; \
+    echo mysql-apt-config mysql-apt-config/unsupported-platform select abort; \
+    } | debconf-set-selections
+
+# 安装服务
+RUN apt-get install -y --no-install-recommends\
     nginx \
-    mysql-community-server \
+    mysql-server \
     mongodb-org \
     redis \
     && for version in $PHP_VERSIONS; do \
     apt-get install -y \
     php${version} \
     php${version}-fpm \
-    php${version}-cli \
     php${version}-common; \
     done
 

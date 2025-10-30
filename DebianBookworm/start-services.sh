@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # 设置MySQL数据目录权限
-chown -R mysql:mysql /etc/mysql
-chown -R mysql:mysql /var/lib/mysql
+mkdir -p /var/run/mysqld /var/lib/mysql /etc/mysql
+chown -R mysql:mysql /var/run/mysqld /var/lib/mysql /etc/mysql
+# chmod -R 644 /etc/mysql/
+# chmod 640 /var/lib/mysql/auto.cnf
 
 # 启动MySQL
-exec mysqld
+exec su -s /bin/bash mysql -c "mysqld"
 service mysql start
 
 # 初始化MySQL数据库和用户
@@ -22,7 +24,7 @@ chown -R mongodb:mongodb /var/lib/mongodb
 chown -R mongodb:mongodb /var/log/mongodb
 chown -R mongodb:mongodb /etc/mongod.conf
 # 启动MongoDB
-exec mongod
+exec su -s /bin/bash mongodb -c "mongod"
 service mongod start
 
 # 设置Redis配置
@@ -36,7 +38,7 @@ chown -R redis:redis /etc/redis
 chown -R redis:redis /var/lib/redis
 
 # 启动Redis
-exec redis-server
+exec su -s /bin/bash redis -c "redis-server"
 service redis-server start
 
 # 启动各版本PHP-FPM
