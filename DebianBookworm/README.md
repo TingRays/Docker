@@ -8,6 +8,14 @@ docker compose up -d --build
 
 # 进入已运行的容器
 docker exec -it php-multi-app /bin/bash
+
+# 查看服务状态
+supervisorctl status
+# 重启特定服务
+supervisorctl restart nginx
+# 查看所有服务日志
+tail -f /var/log/supervisor/supervisord.log
+
 # 复制容器内文件到宿主机
 docker cp php-multi-app:/etc/php/8.3/. ./php/8.3/
 # 复制宿主机文件到容器内

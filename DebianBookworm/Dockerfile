@@ -20,7 +20,8 @@ RUN apt-get install -y --no-install-recommends \
     gpg \
     debian-archive-keyring \
     sudo \
-    dirmngr
+    dirmngr \
+    supervisor
 
 # 在安装基本依赖后立即清理缓存
 RUN apt-get clean
@@ -36,12 +37,17 @@ RUN apt-get clean
 # 创建必要的目录
 RUN mkdir -p /etc/php/ && \
     mkdir -p /etc/nginx/ && \
+    mkdir -p /var/run/mysqld/ && \
     mkdir -p /etc/mysql/ && \
     mkdir -p /var/lib/mysql/ && \
     mkdir -p /var/lib/mongodb/ && \
     mkdir -p /var/log/mongodb/ && \
     mkdir -p /var/www/html/ && \
-    mkdir -p /etc/redis/
+    mkdir -p /etc/redis/ && \
+    mkdir -p /var/lib/redis/ && \
+    mkdir -p /run/php/ && \
+    mkdir -p /var/log/supervisor/ && \
+    mkdir -p /etc/supervisor/conf.d/
 
 # 添加Bullseye安全仓库解决libssl依赖
 RUN echo "deb http://security.debian.org/debian-security bullseye-security main" | sudo tee /etc/apt/sources.list.d/bullseye-security.list
@@ -98,14 +104,14 @@ RUN { \
     } | debconf-set-selections
 
 # 安装服务
-RUN apt-get install -y --no-install-recommends\
+RUN apt-get install -y --no-install-recommends \
     nginx \
     mysql-server \
     mongodb-org \
     redis \
     && for version in $PHP_VERSIONS; do \
-    apt-get install -y \
-    php${version}-fpm ; \
+    apt-get install -y --no-install-recommends \
+    php${version}-fpm; \
     done
 
 # 定义PHP常用扩展列表
@@ -165,7 +171,7 @@ RUN for version in $PHP_VERSIONS; do \
     # 安装常用扩展
     for ext in $PHP_COMMON_EXTENSIONS; do \
     if apt-cache search --names-only "php${version}-${ext}" | grep -q "php${version}-${ext}"; then \
-    apt-get install -y "php${version}-${ext}"; \
+    apt-get install -y --no-install-recommends "php${version}-${ext}"; \
     fi; \
     done; \
     \
@@ -179,32 +185,49 @@ RUN for version in $PHP_VERSIONS; do \
     done
 
 ## 配置PHP各版本
-#RUN for version in $PHP_VERSIONS; do \
-#    # 配置FPM池
-#    sed -i "s/;listen\.owner.*/listen.owner = www-data/" /etc/php/${version}/fpm/pool.d/www.conf && \
-#    sed -i "s/;listen\.group.*/listen.group = www-data/" /etc/php/${version}/fpm/pool.d/www.conf && \
-#    sed -i "s/;listen\.mode.*/listen.mode = 0660/" /etc/php/${version}/fpm/pool.d/www.conf && \
-#    \
-#    # 增加PHP配置
-#    echo "upload_max_filesize = 128M" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "post_max_size = 128M" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "memory_limit = 512M" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "max_execution_time = 300" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "max_input_time = 300" >> /etc/php/${version}/fpm/php.ini && \
-#    \
-#    # 启用OPCache
-#    echo "opcache.enable=1" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "opcache.enable_cli=1" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "opcache.memory_consumption=128" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "opcache.interned_strings_buffer=8" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "opcache.max_accelerated_files=10000" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "opcache.revalidate_freq=2" >> /etc/php/${version}/fpm/php.ini && \
-#    echo "opcache.save_comments=1" >> /etc/php/${version}/fpm/php.ini; \
-#    done
+RUN for version in $PHP_VERSIONS; do \
+    # 配置FPM池
+    sed -i 's/^user = .*/user = www-data/' /etc/php/${version}/fpm/pool.d/www.conf && \
+    sed -i 's/^group = .*/group = www-data/' /etc/php/${version}/fpm/pool.d/www.conf && \
+    sed -i "s/;listen\.mode.*/listen.mode = 0660/" /etc/php/${version}/fpm/pool.d/www.conf && \
+    \
+    # 增加PHP配置
+    echo "upload_max_filesize = 128M" >> /etc/php/${version}/fpm/php.ini && \
+    echo "post_max_size = 128M" >> /etc/php/${version}/fpm/php.ini && \
+    echo "memory_limit = 512M" >> /etc/php/${version}/fpm/php.ini && \
+    echo "max_execution_time = 300" >> /etc/php/${version}/fpm/php.ini && \
+    echo "max_input_time = 300" >> /etc/php/${version}/fpm/php.ini && \
+    \
+    # 启用OPCache
+    echo "opcache.enable=1" >> /etc/php/${version}/fpm/php.ini && \
+    echo "opcache.enable_cli=1" >> /etc/php/${version}/fpm/php.ini && \
+    echo "opcache.memory_consumption=128" >> /etc/php/${version}/fpm/php.ini && \
+    echo "opcache.interned_strings_buffer=8" >> /etc/php/${version}/fpm/php.ini && \
+    echo "opcache.max_accelerated_files=10000" >> /etc/php/${version}/fpm/php.ini && \
+    echo "opcache.revalidate_freq=2" >> /etc/php/${version}/fpm/php.ini && \
+    echo "opcache.save_comments=1" >> /etc/php/${version}/fpm/php.ini; \
+    done
 
-# 复制启动脚本
-COPY start-services.sh /usr/local/bin/start-services.sh
-RUN chmod +x /usr/local/bin/start-services.sh
+# 设置MongoDB、MySQL、Redis、Nginx数据目录权限
+RUN chown -R www-data:www-data /run/php && \
+    chown -R mongodb:mongodb /var/lib/mongodb && \
+    chown -R mongodb:mongodb /var/log/mongodb && \
+    chown -R mongodb:mongodb /etc/mongod.conf && \
+    chown -R mysql:mysql /var/run/mysqld && \
+    chmod -R mysql:mysql  /var/lib/mysqld && \
+    chmod -R mysql:mysql  /etc/mysql && \
+    chown -R redis:redis /etc/redis && \
+    chown -R redis:redis /var/lib/redis && \
+    chown -R www-data:www-data /var/www/html
+
+# 复制supervisor配置文件
+COPY supervisord.conf /etc/supervisor/supervisord.conf
+
+# 复制初始化脚本
+# COPY start-services.sh /usr/local/bin/start-services.sh
+# RUN chmod +x /usr/local/bin/start-services.sh
+COPY init-services.sh /usr/local/bin/init-services.sh
+RUN chmod +x /usr/local/bin/init-services.sh
 
 # 暴露端口
 EXPOSE 80 3306 27017 6379

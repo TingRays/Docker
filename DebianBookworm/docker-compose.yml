@@ -20,14 +20,14 @@ services:
       - ./www/:/var/www/html/
       # Mysql
       # Mysql配置
-      # - ./mysql/conf/my.cnf:/etc/alternatives/my.cnf
-      # - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
-      # - ./mysql/conf/my.cnf.fallback:/etc/mysql/my.cnf.fallback
-      # - ./mysql/conf/mysql.cnf:/etc/mysql/mysql.cnf
-      # - ./mysql/conf/conf.d/:/etc/mysql/conf.d/
-      # - ./mysql/conf/mysql.conf.d/:/etc/mysql/mysql.conf.d/
+      - ./mysql/conf/my.cnf:/etc/alternatives/my.cnf
+      - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/conf/my.cnf.fallback:/etc/mysql/my.cnf.fallback
+      - ./mysql/conf/mysql.cnf:/etc/mysql/mysql.cnf
+      - ./mysql/conf/conf.d/:/etc/mysql/conf.d/
+      - ./mysql/conf/mysql.conf.d/:/etc/mysql/mysql.conf.d/
       # Mysql数据
-      # - ./mysql/data/:/var/lib/mysql/
+      - ./mysql/data/:/var/lib/mysql/
       # Redis
       - ./redis/:/etc/redis/
       # Mongodb
