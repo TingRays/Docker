@@ -27,11 +27,11 @@ services:
       - ./mysql/conf/conf.d/:/etc/mysql/conf.d/
       - ./mysql/conf/mysql.conf.d/:/etc/mysql/mysql.conf.d/
       # Mysql数据
-      - ./mysql/data/:/var/lib/mysql/
+      # - ./mysql/data/:/var/lib/mysql/
       # Redis
       - ./redis/:/etc/redis/
       # Mongodb
-      - ./mongodb/data/:/var/lib/mongodb/
+      # - ./mongodb/data/:/var/lib/mongodb/
       - ./mongodb/log/:/var/log/mongodb/
       - ./mongodb/mongod.conf:/etc/mongod.conf
       # PHP配置目录挂载

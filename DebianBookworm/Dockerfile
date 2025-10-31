@@ -224,10 +224,8 @@ RUN chown -R www-data:www-data /run/php && \
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 
 # 复制初始化脚本
-# COPY start-services.sh /usr/local/bin/start-services.sh
-# RUN chmod +x /usr/local/bin/start-services.sh
-COPY init-services.sh /usr/local/bin/init-services.sh
-RUN chmod +x /usr/local/bin/init-services.sh
+COPY start-services.sh /usr/local/bin/start-services.sh
+RUN chmod +x /usr/local/bin/start-services.sh
 
 # 暴露端口
 EXPOSE 80 3306 27017 6379
