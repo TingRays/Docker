@@ -38,6 +38,7 @@ RUN apt-get clean
 RUN mkdir -p /etc/php/ && \
     mkdir -p /etc/nginx/ && \
     mkdir -p /var/run/mysqld/ && \
+    mkdir -p /var/lib/mysqld/ && \
     mkdir -p /etc/mysql/ && \
     mkdir -p /var/lib/mysql/ && \
     mkdir -p /var/lib/mongodb/ && \
@@ -214,8 +215,8 @@ RUN chown -R www-data:www-data /run/php && \
     chown -R mongodb:mongodb /var/log/mongodb && \
     chown -R mongodb:mongodb /etc/mongod.conf && \
     chown -R mysql:mysql /var/run/mysqld && \
-    chmod -R mysql:mysql  /var/lib/mysqld && \
-    chmod -R mysql:mysql  /etc/mysql && \
+    chown -R mysql:mysql  /var/lib/mysqld && \
+    chown -R mysql:mysql  /etc/mysql && \
     chown -R redis:redis /etc/redis && \
     chown -R redis:redis /var/lib/redis && \
     chown -R www-data:www-data /var/www/html

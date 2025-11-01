@@ -70,6 +70,9 @@ if [ -n "$MYSQL_ROOT_PASSWORD" ] && [ -n "$MYSQL_DATABASE" ] && [ -n "$MYSQL_USE
     wait "$pid" 2>/dev/null || true
 fi
 
+chown -R mysql:mysql /var/run/mysqld
+chown -R mysql:mysql  /var/lib/mysqld
+
 # 启动supervisord
 echo "Starting Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
