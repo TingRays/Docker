@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # 设置MySQL数据目录权限
-chown -R mysql:mysql /var/lib/mysql
+chown -R mysql:mysql /var/lib/mysql/
+chown -R mysql:mysql /etc/mysql/
 
 # 启动MySQL
 service mysql start
