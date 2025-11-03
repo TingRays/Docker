@@ -232,6 +232,10 @@ RUN chmod +x /usr/local/bin/start-services.sh && \
     # 确保文件使用 LF 换行符
     sed -i 's/\r$//' /usr/local/bin/start-services.sh
 
+# 清理APT缓存以减少镜像大小
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # 暴露端口
 EXPOSE 80 3306 27017 6379
 
