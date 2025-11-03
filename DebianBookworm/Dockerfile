@@ -38,6 +38,7 @@ RUN apt-get clean
 RUN mkdir -p /etc/php/ && \
     mkdir -p /etc/nginx/ && \
     mkdir -p /var/run/mysqld/ && \
+    mkdir -p /var/lib/mysqld/ && \
     mkdir -p /etc/mysql/ && \
     mkdir -p /var/lib/mysql/ && \
     mkdir -p /var/lib/mongodb/ && \
@@ -214,18 +215,22 @@ RUN chown -R www-data:www-data /run/php && \
     chown -R mongodb:mongodb /var/log/mongodb && \
     chown -R mongodb:mongodb /etc/mongod.conf && \
     chown -R mysql:mysql /var/run/mysqld && \
-    chmod -R mysql:mysql  /var/lib/mysqld && \
-    chmod -R mysql:mysql  /etc/mysql && \
+    chown -R mysql:mysql  /var/lib/mysqld && \
+    chown -R mysql:mysql  /etc/mysql && \
     chown -R redis:redis /etc/redis && \
     chown -R redis:redis /var/lib/redis && \
     chown -R www-data:www-data /var/www/html
 
 # 复制supervisor配置文件
 COPY supervisord.conf /etc/supervisor/supervisord.conf
+# 确保文件使用 LF 换行符
+RUN sed -i 's/\r$//' /etc/supervisor/supervisord.conf
 
 # 复制初始化脚本
 COPY start-services.sh /usr/local/bin/start-services.sh
-RUN chmod +x /usr/local/bin/start-services.sh
+RUN chmod +x /usr/local/bin/start-services.sh && \
+    # 确保文件使用 LF 换行符
+    sed -i 's/\r$//' /usr/local/bin/start-services.sh
 
 # 暴露端口
 EXPOSE 80 3306 27017 6379

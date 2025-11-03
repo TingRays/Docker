@@ -27,13 +27,15 @@ docker run -it -d --name debian-test debian:bookworm
 sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json << 'EOF'
 {
+  "features": {
+    "buildkit": true
+  },
+  "live-restore": true,
   "registry-mirrors": [
-    "https://docker.mirrors.tuna.tsinghua.edu.cn",
-    "https://hub-mirror.c.163.com",
-    "https://docker.mirrors.ustc.edu.cn",
-    "https://docker.1panel.live/",
-    "https://dytt.online",
-    "https://registry-1.docker.io"
+    "https://docker.1ms.run",
+    "https://docker-0.unsee.tech",
+    "https://docker.m.daocloud.io",
+    "https://registry.docker.io"
   ]
 }
 EOF
