@@ -209,6 +209,16 @@ RUN for version in $PHP_VERSIONS; do \
     echo "opcache.save_comments=1" >> /etc/php/${version}/fpm/php.ini; \
     done
 
+# Mysql配置文件权限
+RUN chmod 644 /etc/mysql/mysql.conf.d/mysqld.cnf && \
+    chmod 644 /etc/mysql/conf.d/mysql.cnf && \
+    rm -rf /var/lib/mysql/* && \
+    echo "[mysqld]" > /etc/mysql/conf.d/docker.cnf && \
+    echo "default_authentication_plugin=caching_sha2_password" >> /etc/mysql/conf.d/docker.cnf && \
+    echo "skip-name-resolve" >> /etc/mysql/conf.d/docker.cnf && \
+    echo "innodb_buffer_pool_size=128M" >> /etc/mysql/conf.d/docker.cnf && \
+    echo "max_connections=100" >> /etc/mysql/conf.d/docker.cnf
+
 # 设置MongoDB、MySQL、Redis、Nginx数据目录权限
 RUN chown -R www-data:www-data /run/php && \
     chown -R mongodb:mongodb /var/lib/mongodb && \
@@ -223,14 +233,10 @@ RUN chown -R www-data:www-data /run/php && \
 
 # 复制supervisor配置文件
 COPY supervisord.conf /etc/supervisor/supervisord.conf
-# 确保文件使用 LF 换行符
-RUN sed -i 's/\r$//' /etc/supervisor/supervisord.conf
 
 # 复制初始化脚本
 COPY start-services.sh /usr/local/bin/start-services.sh
-RUN chmod +x /usr/local/bin/start-services.sh && \
-    # 确保文件使用 LF 换行符
-    sed -i 's/\r$//' /usr/local/bin/start-services.sh
+RUN chmod +x /usr/local/bin/start-services.sh
 
 # 清理APT缓存以减少镜像大小
 RUN apt-get clean && \

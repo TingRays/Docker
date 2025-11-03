@@ -1,0 +1,5 @@
+/DebianBookworks/mongodb/data/*
+/DebianBookworks/mongodb/log/*
+/DebianBookworks/mysql/data/*
+/DebianBookworks/www/*
+!/DebianBookworks/www/index.php
