@@ -213,11 +213,14 @@ RUN for version in $PHP_VERSIONS; do \
 RUN chmod 644 /etc/mysql/mysql.conf.d/mysqld.cnf && \
     chmod 644 /etc/mysql/conf.d/mysql.cnf && \
     rm -rf /var/lib/mysql/* && \
-    echo "[mysqld]" > /etc/mysql/conf.d/docker.cnf && \
-    echo "default_authentication_plugin=caching_sha2_password" >> /etc/mysql/conf.d/docker.cnf && \
-    echo "skip-name-resolve" >> /etc/mysql/conf.d/docker.cnf && \
-    echo "innodb_buffer_pool_size=128M" >> /etc/mysql/conf.d/docker.cnf && \
-    echo "max_connections=100" >> /etc/mysql/conf.d/docker.cnf
+    echo "[mysqld]" > /etc/mysql/conf.d/mysql.cnf && \
+    echo "bind-address = 0.0.0.0" >> /etc/mysql/conf.d/mysql.cnf && \
+    echo "character-set-server=utf8mb4" >> /etc/mysql/conf.d/mysql.cnf && \
+    echo "collation-server=utf8mb4_unicode_ci" >> /etc/mysql/conf.d/mysql.cnf && \
+    echo "default_authentication_plugin=caching_sha2_password" >> /etc/mysql/conf.d/mysql.cnf && \
+    echo "skip-name-resolve" >> /etc/mysql/conf.d/mysql.cnf && \
+    echo "innodb_buffer_pool_size=128M" >> /etc/mysql/conf.d/mysql.cnf && \
+    echo "max_connections=100" >> /etc/mysql/conf.d/mysql.cnf
 
 # 设置MongoDB、MySQL、Redis、Nginx数据目录权限
 RUN chown -R www-data:www-data /run/php && \

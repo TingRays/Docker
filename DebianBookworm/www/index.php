@@ -4,25 +4,30 @@ echo "<h1>PHP环境信息</h1>";
 
 // 显示当前PHP版本
 echo "<p>当前PHP版本: " . PHP_VERSION . "</p>";
-putenv("MYSQL_DATABASE=test");
-putenv("MYSQL_USER=test");
-putenv("MYSQL_PASSWORD=123456");
 putenv("REDIS_PASSWORD=123456");
 print_r(phpinfo());
 // 测试MySQL连接
+
+
+$host = 'localhost';
+$db = 'mysql';
+$user = 'root';
+$pass = '123456';
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+];
+
 try {
-    $pdo = new PDO(
-        'mysql:host=localhost;dbname=' . getenv('MYSQL_DATABASE'), 
-        getenv('MYSQL_USER'), 
-        getenv('MYSQL_PASSWORD')
-    );
+    $pdo = new PDO($dsn, $user, $pass, $options);
     echo "<p style='color: green;'>MySQL连接成功</p>";
-    
-    // 显示MySQL版本
-    $mysql_version = $pdo->getAttribute(PDO::ATTR_SERVER_VERSION);
-    echo "<p>MySQL版本: $mysql_version</p>";
-} catch (PDOException $e) {
-    echo "<p style='color: red;'>MySQL连接失败: " . $e->getMessage() . "</p>";
+} catch (\PDOException $e) {
+    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    //echo "<p style='color: red;'>MySQL连接失败: " . $e->getMessage() . "</p>";
 }
 
 // 测试Redis连接

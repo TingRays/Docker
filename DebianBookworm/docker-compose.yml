@@ -5,9 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: php-multi-app
-    cap_add:
-      - SYS_RESOURCE
-      - SYS_NICE
     ports:
       - "80:80"
       - "3306:3306"
@@ -20,8 +17,8 @@ services:
       - ./www/:/var/www/html/
       # Mysql
       # Mysql配置
-      - ./mysql/conf/my.cnf:/etc/alternatives/my.cnf
-      - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
+      # - ./mysql/conf/my.cnf:/etc/alternatives/my.cnf
+      # - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
       - ./mysql/conf/my.cnf.fallback:/etc/mysql/my.cnf.fallback
       - ./mysql/conf/mysql.cnf:/etc/mysql/mysql.cnf
       - ./mysql/conf/conf.d/:/etc/mysql/conf.d/
