@@ -1,6 +1,6 @@
 services:
   app:
-    image: tingrays:debian-bookworm
+    image: tingrays:debian-trixie
     build: 
       context: .
       dockerfile: Dockerfile
@@ -16,15 +16,16 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./www/:/var/www/html/
       # Mysql
-      # Mysql配置
+      # Mysql配置（由于权限问题不能挂载配置文件，Mysql会认为配置文件全局可写报错，所以这里注释掉）
       # - ./mysql/conf/my.cnf:/etc/alternatives/my.cnf
       # - ./mysql/conf/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/conf/my.cnf.fallback:/etc/mysql/my.cnf.fallback
-      - ./mysql/conf/mysql.cnf:/etc/mysql/mysql.cnf
-      - ./mysql/conf/conf.d/:/etc/mysql/conf.d/
-      - ./mysql/conf/mysql.conf.d/:/etc/mysql/mysql.conf.d/
-      # Mysql数据
-      - ./mysql/data/:/var/lib/mysql/
+      # - ./mysql/conf/my.cnf.fallback:/etc/mysql/my.cnf.fallback
+      # - ./mysql/conf/mysql.cnf:/etc/mysql/mysql.cnf
+      # - ./mysql/conf/conf.d/:/etc/mysql/conf.d/
+      # - ./mysql/conf/mysql.conf.d/:/etc/mysql/mysql.conf.d/
+      # Mysql数据（由于权限问题不能挂载数据目录，所以这里注释掉，使用命名卷。Docker 托管卷在 WSL2 的 Linux 文件系统内创建，完美兼容 Linux 的权限管理机制）
+      # - ./mysql/data/:/var/lib/mysql/
+      - mysql-data:/var/lib/mysql/
       # Redis
       - ./redis/:/etc/redis/
       # Mongodb
@@ -59,7 +60,10 @@ services:
     restart: unless-stopped
     networks:
       - app-network
-
+# 定义Mysql命名卷
+volumes:
+  mysql-data:
+    driver: local
 networks:
   app-network:
     driver: bridge

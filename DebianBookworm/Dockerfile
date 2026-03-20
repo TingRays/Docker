@@ -1,5 +1,5 @@
-# 使用Debian 12作为基础镜像
-FROM debian:bookworm
+# 使用Debian 13 (Trixie) 作为基础镜像
+FROM debian:trixie
 
 # 设置环境变量
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -34,13 +34,15 @@ RUN apt-get clean
 # /var/log/mongodb/ MongoDB日志文件
 # /etc/mongod.conf  MongoDB配置文件
 # /etc/redis/  Redis配置文件目录
-# 创建必要的目录
-RUN mkdir -p /etc/php/ && \
+# 创建必要的目录并预先创建 mysql 用户以解决安装时的权限问题
+RUN groupadd -r mysql && useradd -r -g mysql -d /var/lib/mysql -s /bin/false mysql && \
+    mkdir -p /etc/php/ && \
     mkdir -p /etc/nginx/ && \
     mkdir -p /var/run/mysqld/ && \
     mkdir -p /var/lib/mysqld/ && \
     mkdir -p /etc/mysql/ && \
     mkdir -p /var/lib/mysql/ && \
+    mkdir -p /var/log/mysql/ && \
     mkdir -p /var/lib/mongodb/ && \
     mkdir -p /var/log/mongodb/ && \
     mkdir -p /var/www/html/ && \
@@ -48,39 +50,43 @@ RUN mkdir -p /etc/php/ && \
     mkdir -p /var/lib/redis/ && \
     mkdir -p /run/php/ && \
     mkdir -p /var/log/supervisor/ && \
-    mkdir -p /etc/supervisor/conf.d/
+    mkdir -p /etc/supervisor/conf.d/ && \
+    mkdir -p -m 700 /root/.gnupg && \
+    chown -R mysql:mysql /etc/mysql /var/lib/mysql /var/log/mysql /var/run/mysqld /var/lib/mysqld
 
 # 添加Bullseye安全仓库解决libssl依赖
 RUN echo "deb http://security.debian.org/debian-security bullseye-security main" | sudo tee /etc/apt/sources.list.d/bullseye-security.list
 
 # MongoDB GPG密钥
 RUN curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
-    sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
-    --dearmor
+    gpg --dearmor -o /usr/share/keyrings/mongodb-server-8.0.gpg && \
+    chmod 644 /usr/share/keyrings/mongodb-server-8.0.gpg
 
 # MySQL APT存储库
 # RUN curl -sSL https://repo.mysql.com/mysql-apt-config_0.8.36-1_all.deb > /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
 COPY mysql-apt-config_0.8.36-1_all.deb /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
 
 # Redis GPG密钥
-RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-RUN sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+RUN curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg && \
+    chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
 
 # 添加Nginx GPG密钥
-RUN curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null && \
-    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+RUN curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg && \
+    chmod 644 /usr/share/keyrings/nginx-archive-keyring.gpg
 
 # 添加PHP仓库 (Sury)
 # https://deb.sury.org/ 是Debian官方的PHP构建者维护的PHP源
 # https://packages.sury.org/php/README.txt 的步骤可以直接添加最新的PHP源到apt source
+# 对于 Trixie，Sury 仓库可能存在 php-common 版本冲突，需要设置 APT Pinning
 RUN curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb && \
     dpkg -i /tmp/debsuryorg-archive-keyring.deb && \
-    sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+    sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' && \
+    echo "Package: php*\nPin: origin packages.sury.org\nPin-Priority: 1001" > /etc/apt/preferences.d/sury-php
 
 # 添加MySQL仓库
 RUN sudo DEBIAN_FRONTEND=noninteractive dpkg -i /usr/local/bin/mysql-apt-config_0.8.36-1_all.deb
 
-# 添加MongoDB仓库
+# 添加MongoDB仓库 (目前官方尚无 Trixie 专属仓库，沿用 Bookworm 仓库通常可正常工作)
 RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] http://repo.mongodb.org/apt/debian bookworm/mongodb-org/8.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
 
 # 添加Redis仓库
@@ -95,7 +101,7 @@ RUN apt-get update
 # MySQL静默安装预配置
 RUN { \
     echo mysql-apt-config mysql-apt-config/connectors-component string mysql-tools; \
-    echo mysql-apt-config mysql-apt-config/repo-codename select bookworm; \
+    echo mysql-apt-config mysql-apt-config/repo-codename select trixie; \
     echo mysql-apt-config mysql-apt-config/repo-distro select debian; \
     echo mysql-apt-config mysql-apt-config/repo-url string http://repo.mysql.com/apt; \
     echo mysql-apt-config mysql-apt-config/select-connectors select Enabled; \
@@ -227,9 +233,6 @@ RUN chown -R www-data:www-data /run/php && \
     chown -R mongodb:mongodb /var/lib/mongodb && \
     chown -R mongodb:mongodb /var/log/mongodb && \
     chown -R mongodb:mongodb /etc/mongod.conf && \
-    chown -R mysql:mysql /var/run/mysqld && \
-    chown -R mysql:mysql  /var/lib/mysqld && \
-    chown -R mysql:mysql  /etc/mysql && \
     chown -R redis:redis /etc/redis && \
     chown -R redis:redis /var/lib/redis && \
     chown -R www-data:www-data /var/www/html

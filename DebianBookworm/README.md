@@ -1,9 +1,11 @@
+# 创建软连接到宿主机
+ln -s /mnt/d/phpEnv/www/ /home/aaron/
 # 拉取代码到本地宿主机
 git clone https://github.com/tingrays/xxxxxx.git 
 # 进入目录下
 cd /xxxx/Docker/DebianBookworm/
 # 构建并启动容器
-docker compose up -d --build
+sudo docker compose up -d --build
 # 访问 http://localhost 查看PHP信息页面
 
 # 进入已运行的容器
@@ -21,7 +23,7 @@ docker cp php-multi-app:/etc/php/8.3/. ./php/8.3/
 # 复制宿主机文件到容器内
 docker cp ./mysql-apt-config_0.8.35-1_all.deb debian-test:/usr/local/bin/mysql-apt-config_0.8.35-1_all.deb
 # 创建一个测试容器
-docker run -it -d --name debian-test debian:bookworm
+docker run -it -d --name debian-test debian:trixie
 
 # 镜像源：
 sudo mkdir -p /etc/docker

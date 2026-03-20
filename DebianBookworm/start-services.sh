@@ -1,10 +1,16 @@
 #!/bin/bash
 set -e
 
+# 确保MySQL所有必要的目录存在且权限正确
+mkdir -p /var/run/mysqld
+mkdir -p /var/lib/mysql
+mkdir -p /var/log/mysql
+chown -R mysql:mysql /var/run/mysqld /var/lib/mysql /var/log/mysql
+
 chmod 644 /etc/mysql/conf.d/mysql.cnf 2>/dev/null || true
 chmod 644 /etc/mysql/mysql.conf.d/mysqld.cnf 2>/dev/null || true
 
-sleep 10
+sleep 5
 
 # 初始化Mysql（仅在数据目录为空时）
 if [ ! -d "/var/lib/mysql/mysql" ]; then
@@ -22,31 +28,44 @@ fi
 if [ ! -f "/var/lib/mysql/user_configured" ]; then
     if [ -n "$MYSQL_ROOT_PASSWORD" ] && [ -n "$MYSQL_DATABASE" ] && [ -n "$MYSQL_USER" ] && [ -n "$MYSQL_PASSWORD" ]; then 
         echo "Configuring MySQL users..."
-        mysqld_safe --user=mysql --skip-networking &
-        pid="$!"
+        # 临时关闭 set -e 以便在 mysqld 启动失败时能打印日志
+        set +e
+        mysqld --user=mysql --skip-networking --daemonize
+        MYSQL_START_EXIT_CODE=$?
+        set -e
 
+        if [ $MYSQL_START_EXIT_CODE -ne 0 ]; then
+            echo "CRITICAL: MySQL failed to start with exit code $MYSQL_START_EXIT_CODE. Checking error log:"
+            [ -f /var/log/mysql/error.log ] && cat /var/log/mysql/error.log || echo "Error log not found."
+            exit 1
+        fi
+        
         # 等待MySQL启动
-        until mysqladmin ping >/dev/null 2>&1; do
-            sleep 10
+        max_attempts=30
+        attempt=0
+        until mysqladmin ping >/dev/null 2>&1 || [ $attempt -eq $max_attempts ]; do
+            sleep 2
+            attempt=$((attempt + 1))
         done
 
-        # 配置root密码
+        if [ $attempt -eq $max_attempts ]; then
+            echo "CRITICAL: MySQL failed to start within timeout. Checking error log:"
+            [ -f /var/log/mysql/error.log ] && cat /var/log/mysql/error.log || echo "Error log not found."
+            exit 1
+        fi
+
+        # 配置账户
         mysql -u root -e "FLUSH PRIVILEGES;" || true
         mysql -u root -e "ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" || true
-        mysql -u root -e "DROP USER root@'localhost';" || true
+        mysql -u root -e "DROP USER IF EXISTS root@'localhost';" || true
         mysql -u root -e "FLUSH PRIVILEGES;" || true
 
-        kill "$pid"
-        wait "$pid" 2>/dev/null || true
+        mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
 
         touch /var/lib/mysql/user_configured
         echo "MySQL basic configuration completed."
     fi
 fi
-
-chown -R mysql:mysql /var/run/mysqld
-chown -R mysql:mysql /var/lib/mysqld
-chown -R mysql:mysql /var/lib/mysql
 
 # 启动supervisord
 echo "Starting Supervisor..."
