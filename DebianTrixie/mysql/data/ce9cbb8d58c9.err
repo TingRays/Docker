@@ -1,0 +1,31 @@
+2026-03-20T08:04:41.580139Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-03-20T08:04:41.870971Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.8) starting as process 96
+2026-03-20T08:04:41.874848Z 0 [Warning] [MY-010159] [Server] Setting lower_case_table_names=2 because file system for /var/lib/mysql/ is case insensitive
+2026-03-20T08:04:41.883523Z 0 [Warning] [MY-000054] [Server] World-writable config file '/var/lib/mysql/auto.cnf' is ignored.
+2026-03-20T08:04:41.884218Z 0 [Warning] [MY-010107] [Server] World-writable config file '/var/lib/mysql/auto.cnf' has been removed.
+2026-03-20T08:04:41.884849Z 0 [Warning] [MY-010075] [Server] No existing UUID has been found, so we assume that this is the first time that this server has been started. Generating a new UUID: 7323b51e-2433-11f1-97af-eeb4dd363200.
+2026-03-20T08:04:41.892551Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+get_mempolicy: Operation not permitted
+2026-03-20T08:04:41.999707Z 1 [Warning] [MY-011873] [InnoDB] Failed to set NUMA memory policy to MPOL_INTERLEAVE: Operation not permitted
+get_mempolicy: Operation not permitted
+2026-03-20T08:04:42.000218Z 0 [Warning] [MY-011879] [InnoDB] Failed to set NUMA memory policy of buffer pool page frames with mbind(0x73c7cfd1f000,137236480,MPOL_INTERLEAVE,...,...,MPOL_MF_MOVE) failed with Operation not permitted
+2026-03-20T08:04:42.008333Z 1 [Warning] [MY-011875] [InnoDB] Failed to set NUMA memory policy to MPOL_DEFAULT: Operation not permitted
+2026-03-20T08:04:42.570516Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+mysqld: Table 'mysql.plugin' doesn't exist
+2026-03-20T08:04:42.721812Z 0 [ERROR] [MY-010735] [Server] Could not open the mysql.plugin table. Please perform the MySQL upgrade procedure.
+2026-03-20T08:04:42.722156Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.722329Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.722522Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.722764Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.722908Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.723168Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.723345Z 0 [Warning] [MY-010441] [Server] Failed to open optimizer cost constant tables
+2026-03-20T08:04:42.871826Z 0 [Warning] [MY-010015] [Repl] Gtid table is not ready to be used. Table 'mysql.gtid_executed' cannot be opened.
+2026-03-20T08:04:42.959326Z 0 [Warning] [MY-010015] [Repl] Gtid table is not ready to be used. Table 'mysql.gtid_executed' cannot be opened.
+2026-03-20T08:04:42.971667Z 0 [Warning] [MY-013595] [Server] Failed to initialize TLS for channel: mysql_main. See below for the description of exact issue.
+2026-03-20T08:04:42.972207Z 0 [Warning] [MY-010069] [Server] Failed to set up SSL because of the following SSL library error: SSL context is not usable without certificate and private key
+mysqld: Cannot change permissions of the file 'private_key.pem.temp' (OS errno 1 - Operation not permitted)
+2026-03-20T08:04:43.052416Z 0 [ERROR] [MY-010295] [Server] Could not set file permission for private_key.pem
+2026-03-20T08:04:43.052518Z 0 [ERROR] [MY-010119] [Server] Aborting
+2026-03-20T08:04:44.304509Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.8)  MySQL Community Server - GPL.
+2026-03-20T08:04:44.304769Z 0 [System] [MY-015016] [Server] MySQL Server - end.
