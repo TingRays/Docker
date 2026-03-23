@@ -16,7 +16,7 @@ sleep 5
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     if [ -z "$(ls -A /var/lib/mysql 2>/dev/null)" ]; then
         echo "Initializing MySQL data directory..."
-        mysqld --initialize-insecure --user=mysql
+        mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
     else
         echo "MySQL data directory is not empty, skipping initialization..."
     fi
@@ -56,7 +56,7 @@ if [ ! -f "/var/lib/mysql/user_configured" ]; then
 
         # 配置账户
         mysql -u root -e "FLUSH PRIVILEGES;" || true
-        mysql -u root -e "ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" || true
+        mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" || true
         mysql -u root -e "DROP USER IF EXISTS root@'localhost';" || true
         mysql -u root -e "FLUSH PRIVILEGES;" || true
 
