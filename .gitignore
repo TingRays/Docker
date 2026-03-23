@@ -1,5 +1,5 @@
-/DebianBookworm/mongodb/data/*
-/DebianBookworm/mongodb/log/*
-/DebianBookworm/mysql/data/*
-/DebianBookworm/www/*
-!/DebianBookworm/www/index.php
+/DebianTrixie/mongodb/data/*
+/DebianTrixie/mongodb/log/*
+/DebianTrixie/mysql/data/*
+/DebianTrixie/www/*
+!/DebianTrixie/www/index.php
