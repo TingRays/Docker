@@ -56,6 +56,15 @@ docker run --rm -it -v ${PWD}:/usr/src/project gcc:4.9
 docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 ```
 
-目录：DebianBasicImage
+目录：DebianTrixie
 
 以 Debian 作为基础镜像，在基础镜像里安装 Nginx、Redis、PHP、Mysql等服务，构建运行环境
+#### 创建软连接到宿主机
+ln -s /mnt/d/phpEnv/www/ /home/aaron/
+#### 拉取代码到本地宿主机
+git clone https://github.com/tingrays/xxxxxx.git 
+#### 进入目录下
+cd /xxxx/Docker/DebianTrixie/
+#### 构建并启动容器
+sudo docker compose up -d --build
+#### 访问 http://localhost 查看PHP信息页面
