@@ -55,6 +55,7 @@ docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 docker run --rm -it -v ${PWD}:/usr/src/project gcc:4.9
 docker run --rm -it -v $(pwd):/usr/src/project gcc:4.9
 ```
+### 查看[WSL](./WSL.md)的一些配置操作
 
 目录：DebianTrixie
 
