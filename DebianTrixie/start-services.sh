@@ -56,9 +56,25 @@ if [ ! -f "/var/lib/mysql/user_configured" ]; then
 
         # 配置账户
         mysql -u root -e "FLUSH PRIVILEGES;" || true
+        # 确保 root 用户在 localhost 和 % 都有正确的密码
         mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" || true
-        mysql -u root -e "DROP USER IF EXISTS root@'localhost';" || true
-        mysql -u root -e "FLUSH PRIVILEGES;" || true
+        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" || true
+        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';" || true
+        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;" || true
+        
+        # 创建应用数据库和用户
+        if [ -n "$MYSQL_DATABASE" ]; then
+            mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;" || true
+        fi
+        if [ -n "$MYSQL_USER" ] && [ -n "$MYSQL_PASSWORD" ]; then
+            mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';" || true
+            mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "ALTER USER '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';" || true
+            if [ -n "$MYSQL_DATABASE" ]; then
+                mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';" || true
+            fi
+        fi
+        
+        mysql -u root -p"${MYSQL_ROOT_PASSWORD}" -e "FLUSH PRIVILEGES;" || true
 
         mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
 
@@ -70,44 +86,3 @@ fi
 # 启动supervisord
 echo "Starting Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
-
-# --------------------------------------------------------- OLD BEGIN ---------------------------------------------------------
-
-# #!/bin/bash
-
-# # 启动MySQL
-# exec su -s /bin/bash mysql -c "mysqld"
-# # service mysql start
-
-# # 初始化MySQL数据库和用户
-# if [ -n "$MYSQL_ROOT_PASSWORD" ] && [ -n "$MYSQL_DATABASE" ] && [ -n "$MYSQL_USER" ] && [ -n "$MYSQL_PASSWORD" ]; then
-#     mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${MYSQL_ROOT_PASSWORD}';"
-#     mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE};"
-#     mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
-#     mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';"
-#     mysql -u root -p${MYSQL_ROOT_PASSWORD} -e "FLUSH PRIVILEGES;"
-# fi
-
-
-# # 启动MongoDB
-# exec su -s /bin/bash mongodb -c "mongod"
-# # ervice mongod start
-
-# # 设置Redis配置
-# if [ -n "$REDIS_PASSWORD" ]; then
-#     sed -i "s/# requirepass .*/requirepass ${REDIS_PASSWORD}/" /etc/redis/redis.conf
-# fi
-
-# # 启动Redis
-# exec su -s /bin/bash redis -c "redis-server"
-# # service redis-server start
-
-# # 启动各版本PHP-FPM
-# for version in 7.4 8.0 8.3; do
-#     exec /etc/init.d/php${version}-fpm start
-#     # service php${version}-fpm start
-# done
-
-
-# # 启动Nginx
-# exec nginx -g "daemon off;"
