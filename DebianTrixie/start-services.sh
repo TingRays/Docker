@@ -4,6 +4,10 @@ set -e
 # 确保 web 目录权限正确
 chown -R www-data:www-data /var/www/html
 
+# 清理旧的 PHP-FPM socket 文件，防止启动冲突
+mkdir -p /run/php
+rm -f /run/php/*.sock
+
 # 确保MySQL所有必要的目录存在且权限正确
 mkdir -p /var/run/mysqld
 mkdir -p /var/lib/mysql
