@@ -134,7 +134,16 @@ ENV PHP_COMMON_EXTENSIONS=" \
     exif \
     fileinfo \
     ftp \
+    mysql \
+    mysqli \
+    pdo \
+    pdo_pgsql \
+    pdo_sqlite \
+    pgsql \
     gd \
+    odbc \
+    openssl \
+    sodium \
     gettext \
     gmp \
     iconv \
@@ -143,14 +152,8 @@ ENV PHP_COMMON_EXTENSIONS=" \
     json \
     ldap \
     mbstring \
-    mysqli \
     opcache \
     pcntl \
-    pdo \
-    mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    pgsql \
     phar \
     posix \
     pspell \
@@ -178,15 +181,15 @@ RUN for version in $PHP_VERSIONS; do \
     # 安装常用扩展
     for ext in $PHP_COMMON_EXTENSIONS; do \
     if apt-cache search --names-only "php${version}-${ext}" | grep -q "php${version}-${ext}"; then \
-    apt-get install -y --no-install-recommends "php${version}-${ext}"; \
+    apt-get install -y --no-install-recommends --fix-missing "php${version}-${ext}"; \
     fi; \
     done; \
     \
     # 安装特殊扩展
-    apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends --fix-missing \
     php${version}-mongodb \
     php${version}-redis \
-    php${version}-memcached \
+    # php${version}-memcached \
     php${version}-xdebug \
     php${version}-imagick; \
     done
@@ -248,7 +251,7 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 暴露端口
-EXPOSE 80 3306 27017 6379
+EXPOSE 80 443 3306 27017 6379
 
 # 设置工作目录
 WORKDIR /var/www/html

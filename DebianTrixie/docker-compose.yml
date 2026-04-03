@@ -7,6 +7,7 @@ services:
     container_name: php-multi-app
     ports:
       - "80:80"
+      - "443:443"
       - "3306:3306"
       - "27017:27017"
       - "6379:6379"
@@ -34,23 +35,23 @@ services:
       - ./mongodb/mongod.conf:/etc/mongod.conf
       # PHP配置目录挂载
       # PHP7.4
-      - ./php/7.4/cli/php.ini:/etc/php/7.4/cli/php.ini
-      - ./php/7.4/fpm/php-fpm.conf:/etc/php/7.4/fpm/php-fpm.conf
-      - ./php/7.4/fpm/php.ini:/etc/php/7.4/fpm/php.ini
-      - ./php/7.4/fpm/pool.d:/etc/php/7.4/fpm/pool.d
-      - ./php/7.4/mods-available/:/etc/php/7.4/mods-available/
+      # - ./php/7.4/cli/php.ini:/etc/php/7.4/cli/php.ini
+      # - ./php/7.4/fpm/php-fpm.conf:/etc/php/7.4/fpm/php-fpm.conf
+      # - ./php/7.4/fpm/php.ini:/etc/php/7.4/fpm/php.ini
+      # - ./php/7.4/fpm/pool.d:/etc/php/7.4/fpm/pool.d
+      # - ./php/7.4/mods-available/:/etc/php/7.4/mods-available/
       # PHP8.0
-      - ./php/8.0/cli/php.ini:/etc/php/8.0/cli/php.ini
-      - ./php/8.0/fpm/php-fpm.conf:/etc/php/8.0/fpm/php-fpm.conf
-      - ./php/8.0/fpm/php.ini:/etc/php/8.0/fpm/php.ini
-      - ./php/8.0/fpm/pool.d:/etc/php/8.0/fpm/pool.d
-      - ./php/8.0/mods-available/:/etc/php/8.0/mods-available/
+      # - ./php/8.0/cli/php.ini:/etc/php/8.0/cli/php.ini
+      # - ./php/8.0/fpm/php-fpm.conf:/etc/php/8.0/fpm/php-fpm.conf
+      # - ./php/8.0/fpm/php.ini:/etc/php/8.0/fpm/php.ini
+      # - ./php/8.0/fpm/pool.d:/etc/php/8.0/fpm/pool.d
+      # - ./php/8.0/mods-available/:/etc/php/8.0/mods-available/
       # PHP8.0
-      - ./php/8.3/cli/php.ini:/etc/php/8.3/cli/php.ini
-      - ./php/8.3/fpm/php-fpm.conf:/etc/php/8.3/fpm/php-fpm.conf
-      - ./php/8.3/fpm/php.ini:/etc/php/8.3/fpm/php.ini
-      - ./php/8.3/fpm/pool.d:/etc/php/8.3/fpm/pool.d
-      - ./php/8.3/mods-available/:/etc/php/8.3/mods-available/
+      # - ./php/8.3/cli/php.ini:/etc/php/8.3/cli/php.ini
+      # - ./php/8.3/fpm/php-fpm.conf:/etc/php/8.3/fpm/php-fpm.conf
+      # - ./php/8.3/fpm/php.ini:/etc/php/8.3/fpm/php.ini
+      # - ./php/8.3/fpm/pool.d:/etc/php/8.3/fpm/pool.d
+      # - ./php/8.3/mods-available/:/etc/php/8.3/mods-available/
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}

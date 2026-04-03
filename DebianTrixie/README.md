@@ -4,6 +4,8 @@ ln -s /mnt/d/phpEnv/www/ /home/aaron/
 git clone https://github.com/tingrays/xxxxxx.git 
 # 进入目录下
 cd /xxxx/Docker/DebianTrixie/
+# 彻底移除旧的容器和卷（确保之前的残留配置不会干扰）
+sudo docker compose down -v
 # 构建并启动容器
 sudo docker compose up -d --build
 # 访问 http://localhost 查看PHP信息页面
